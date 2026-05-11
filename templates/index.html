@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EliteApplier | Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+</head>
+<body data-theme="dark">
+    <div class="split-layout">
+        
+        <!-- LEFT PANEL: ACTION & STATUS (Always Dark/Vibrant) -->
+        <section class="panel-action">
+            <div class="brand-header">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="app-logo">
+                <span>EliteApplier</span>
+            </div>
+
+            <div class="status-hero">
+                <div class="pulse-indicator" id="pulseIndicator"></div>
+                <h1 id="statusBigText">Standby.</h1>
+                <p id="statusSubText">System is ready. Configure targets on the right, then initiate the sequence.</p>
+            </div>
+
+            <div class="main-controls">
+                <button id="startBotBtn" class="giant-btn">
+                    INITIATE AUTOMATION
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+                <button id="stopBotBtn" class="giant-btn danger" style="display:none;">
+                    HALT SEQUENCE
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+                </button>
+            </div>
+
+            <div class="metrics-row">
+                <div class="metric-big">
+                    <span class="m-val" id="totalApps">0</span>
+                    <span class="m-lbl">Total Applied</span>
+                </div>
+                <div class="metric-big">
+                    <span class="m-val" id="easyApps">0</span>
+                    <span class="m-lbl">Easy Matches</span>
+                </div>
+                <div class="metric-big">
+                    <span class="m-val" id="externalApps">0</span>
+                    <span class="m-lbl">External Links</span>
+                </div>
+            </div>
+
+            <div class="ghost-terminal">
+                <div class="terminal-header">LIVE FEED</div>
+                <div class="terminal-content" id="logViewer">
+> Awaiting command...
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL: CONFIGURATION & INTEL (Themable) -->
+        <section class="panel-config">
+            <div class="config-header">
+                <h2>Preferences</h2>
+                <button class="theme-btn" id="themeToggle" title="Toggle Theme">
+                    <svg class="sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon" style="display:none;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+
+            <div class="scroll-content">
+                
+                <div class="form-section">
+                    <h3>Search Intel</h3>
+                    <div class="input-group full">
+                        <label>Search Roles</label>
+                        <div class="tag-container" id="roleTagContainer">
+                            <div id="roleTagsList" class="tags-list"></div>
+                            <input type="text" id="roleInput" placeholder="Type a role and press Enter...">
+                        </div>
+                        <input type="hidden" id="cfg_search_terms">
+                    </div>
+                    
+                    <div class="custom-dropdown" id="locationDropdown">
+                        <label>Target Location</label>
+                        <div class="dropdown-trigger" onclick="toggleLocationMenu()">
+                            <span id="selectedLocationText">Select Location...</span>
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="dropdown-menu" id="locationMenu">
+                            <div class="dropdown-search">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                <input type="text" id="locationSearchInput" placeholder="Search locations..." onkeyup="filterLocations()">
+                            </div>
+                            <ul class="dropdown-options" id="locationOptions"></ul>
+                        </div>
+                        <input type="hidden" id="cfg_search_location">
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="custom-dropdown" id="datePostedDropdown">
+                            <label>Date Posted</label>
+                            <div class="dropdown-trigger" onclick="toggleCustomMenu('datePostedMenu', 'datePostedOptions', 'datePosted')">
+                                <span id="selectedDateText">Any time</span>
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="dropdown-menu" id="datePostedMenu">
+                                <ul class="dropdown-options" id="datePostedOptions"></ul>
+                            </div>
+                            <input type="hidden" id="cfg_date_posted" value="Any time">
+                        </div>
+
+                        <div class="custom-dropdown" id="easyApplyDropdown">
+                            <label>Easy Apply Only</label>
+                            <div class="dropdown-trigger" onclick="toggleCustomMenu('easyApplyMenu', 'easyApplyOptions', 'easyApply')">
+                                <span id="selectedEasyApplyText">Yes</span>
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="dropdown-menu" id="easyApplyMenu">
+                                <ul class="dropdown-options" id="easyApplyOptions"></ul>
+                            </div>
+                            <input type="hidden" id="cfg_easy_apply_only" value="True">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Application Logic</h3>
+                    
+                    <div class="input-row">
+                        <div class="custom-dropdown" id="requireVisaDropdown">
+                            <label>Require Visa?</label>
+                            <div class="dropdown-trigger" onclick="toggleCustomMenu('requireVisaMenu', 'requireVisaOptions', 'requireVisa')">
+                                <span id="selectedVisaText">No</span>
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="dropdown-menu" id="requireVisaMenu">
+                                <ul class="dropdown-options" id="requireVisaOptions"></ul>
+                            </div>
+                            <input type="hidden" id="cfg_require_visa" value="No">
+                        </div>
+
+                        <div class="custom-dropdown" id="connectHrDropdown">
+                            <label>Contact Hiring Manager?</label>
+                            <div class="dropdown-trigger" onclick="toggleCustomMenu('connectHrMenu', 'connectHrOptions', 'connectHr')">
+                                <span id="selectedHrText">Yes</span>
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="dropdown-menu" id="connectHrMenu">
+                                <ul class="dropdown-options" id="connectHrOptions"></ul>
+                            </div>
+                            <input type="hidden" id="cfg_connect_hr" value="True">
+                        </div>
+                    </div>
+
+                    <div class="clean-input" id="hr_message_wrap">
+                        <label>AI Connection Message</label>
+                        <textarea id="cfg_connect_request_message" rows="3" placeholder="Enter custom message or prompt..."></textarea>
+                    </div>
+                </div>
+
+                <div class="action-footer">
+                    <span id="saveStatus" class="save-status">All changes synced.</span>
+                    <button class="minimal-btn" onclick="saveSettings()">Sync Configurations</button>
+                </div>
+
+                <div class="form-section history-section">
+                    <h3>Recent Matches</h3>
+                    <ul class="clean-list" id="jobsList">
+                        <!-- History injected here -->
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Universal Custom Dropdown Logic
+        const dropdownData = {
+            location: {
+                list: ["Worldwide", "Remote", "Africa", "Asia", "Europe", "North America", "Oceania", "South America", "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"],
+                searchable: true,
+                hiddenId: 'cfg_search_location',
+                textId: 'selectedLocationText'
+            },
+            datePosted: {
+                list: ["Any time", "Past month", "Past week", "Past 24 hours"],
+                searchable: false,
+                hiddenId: 'cfg_date_posted',
+                textId: 'selectedDateText'
+            },
+            easyApply: {
+                list: ["Yes", "No"],
+                values: ["True", "False"],
+                searchable: false,
+                hiddenId: 'cfg_easy_apply_only',
+                textId: 'selectedEasyApplyText'
+            },
+            requireVisa: {
+                list: ["Yes", "No"],
+                searchable: false,
+                hiddenId: 'cfg_require_visa',
+                textId: 'selectedVisaText'
+            },
+            connectHr: {
+                list: ["Yes", "No"],
+                values: ["True", "False"],
+                searchable: false,
+                hiddenId: 'cfg_connect_hr',
+                textId: 'selectedHrText',
+                callback: toggleHrMessage
+            }
+        };
+
+        function renderCustomOptions(type, optionsId, filterText = '') {
+            const listEl = document.getElementById(optionsId);
+            const data = dropdownData[type];
+            listEl.innerHTML = '';
+            
+            const lowerFilter = filterText.toLowerCase();
+            const filtered = data.list.filter(l => l.toLowerCase().includes(lowerFilter));
+            
+            filtered.forEach((label, idx) => {
+                const li = document.createElement('li');
+                li.innerText = label;
+                const value = data.values ? data.values[data.list.indexOf(label)] : label;
+                li.onclick = () => selectCustomOption(type, label, value);
+                listEl.appendChild(li);
+            });
+        }
+
+        function toggleCustomMenu(menuId, optionsId, type) {
+            // Close all other menus first
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                if(m.id !== menuId) m.classList.remove('show');
+            });
+
+            const menu = document.getElementById(menuId);
+            menu.classList.toggle('show');
+            
+            if(menu.classList.contains('show')) {
+                renderCustomOptions(type, optionsId);
+                const searchInput = menu.querySelector('input');
+                if(searchInput) {
+                    searchInput.value = '';
+                    searchInput.focus();
+                }
+            }
+        }
+
+        function toggleLocationMenu() {
+            toggleCustomMenu('locationMenu', 'locationOptions', 'location');
+        }
+
+        function filterLocations() {
+            const val = document.getElementById('locationSearchInput').value;
+            renderCustomOptions('location', 'locationOptions', val);
+        }
+
+        function filterGeneric(input, type, optionsId) {
+            renderCustomOptions(type, optionsId, input.value);
+        }
+
+        function selectCustomOption(type, label, value) {
+            const data = dropdownData[type];
+            document.getElementById(data.hiddenId).value = value;
+            document.getElementById(data.textId).innerText = label;
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+            if(data.callback) data.callback();
+        }
+
+        // Close dropdown if clicked outside
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.custom-dropdown')) {
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+            }
+        });
+
+        // Tag Management
+        let currentRoles = [];
+        const roleInput = document.getElementById('roleInput');
+        const roleTagsList = document.getElementById('roleTagsList');
+        const hiddenTermsInput = document.getElementById('cfg_search_terms');
+
+        function renderTags(tags) {
+            currentRoles = tags;
+            roleTagsList.innerHTML = '';
+            tags.forEach(tag => {
+                const chip = document.createElement('div');
+                chip.className = 'tag-chip';
+                chip.innerHTML = `
+                    <span>${tag}</span>
+                    <span class="remove-tag" onclick="removeTag('${tag}')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </span>
+                `;
+                roleTagsList.appendChild(chip);
+            });
+            hiddenTermsInput.value = tags.join(', ');
+        }
+
+        roleInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const val = roleInput.value.trim();
+                if (val && !currentRoles.includes(val)) {
+                    currentRoles.push(val);
+                    renderTags(currentRoles);
+                    roleInput.value = '';
+                }
+            }
+        });
+
+        function removeTag(tag) {
+            currentRoles = currentRoles.filter(t => t !== tag);
+            renderTags(currentRoles);
+        }
+
+        // Theme Logic
+        const toggleBtn = document.getElementById('themeToggle');
+        const sunIcon = document.querySelector('.sun');
+        const moonIcon = document.querySelector('.moon');
+        const savedTheme = localStorage.getItem('elite_theme') || 'dark';
+        
+        document.body.setAttribute('data-theme', savedTheme);
+        updateThemeIcons(savedTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            const current = document.body.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', next);
+            localStorage.setItem('elite_theme', next);
+            updateThemeIcons(next);
+        });
+
+        function updateThemeIcons(theme) {
+            if (theme === 'dark') {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            }
+        }
+
+        // Logic
+        const startBtn = document.getElementById('startBotBtn');
+        const stopBtn = document.getElementById('stopBotBtn');
+        const statusBigText = document.getElementById('statusBigText');
+        const statusSubText = document.getElementById('statusSubText');
+        const pulseIndicator = document.getElementById('pulseIndicator');
+
+        async function updateBotStatus() {
+            try {
+                const r = await fetch('/api/bot/status');
+                const data = await r.json();
+                if (data.status === 'running') {
+                    statusBigText.innerText = 'Active.';
+                    statusBigText.style.color = '#fff';
+                    statusSubText.innerText = 'Agent is currently scanning and applying to targets.';
+                    pulseIndicator.classList.add('active');
+                    startBtn.style.display = 'none';
+                    stopBtn.style.display = 'flex';
+                } else {
+                    statusBigText.innerText = 'Standby.';
+                    statusBigText.style.color = 'rgba(255,255,255,0.4)';
+                    statusSubText.innerText = 'System is ready. Configure targets on the right, then initiate.';
+                    pulseIndicator.classList.remove('active');
+                    startBtn.style.display = 'flex';
+                    stopBtn.style.display = 'none';
+                }
+            } catch (e) {}
+        }
+
+        startBtn.onclick = async () => {
+            startBtn.disabled = true;
+            statusBigText.innerText = 'Igniting...';
+            statusSubText.innerText = 'Synchronizing parameters and connecting to platform.';
+            await saveSettings();
+            
+            const r = await fetch('/api/bot/start', { method: 'POST' });
+            const result = await r.json();
+            if(result.error) {
+                statusBigText.innerText = 'Error.';
+                statusSubText.innerText = result.error;
+            } else {
+                updateBotStatus();
+            }
+            startBtn.disabled = false;
+        };
+
+        stopBtn.onclick = async () => {
+            stopBtn.disabled = true;
+            statusBigText.innerText = 'Halting...';
+            await fetch('/api/bot/stop', { method: 'POST' });
+            updateBotStatus();
+            stopBtn.disabled = false;
+        };
+
+        async function fetchLogs() {
+            const v = document.getElementById('logViewer');
+            try {
+                const r = await fetch('/logs');
+                const t = await r.text();
+                if(t !== v.innerText) {
+                    v.innerText = t;
+                    v.scrollTop = v.scrollHeight;
+                }
+            } catch (e) {}
+        }
+
+        async function fetchJobs() {
+            try {
+                const r = await fetch('/applied-jobs');
+                const jobs = await r.json();
+                
+                document.getElementById('totalApps').innerText = jobs.length;
+                const easy = jobs.filter(j => j.External_Job_link === 'Easy Applied').length;
+                document.getElementById('easyApps').innerText = easy;
+                document.getElementById('externalApps').innerText = jobs.length - easy;
+
+                const list = document.getElementById('jobsList');
+                list.innerHTML = '';
+                jobs.slice(0, 10).forEach(job => {
+                    const isSuccess = job.Date_Applied !== 'Pending';
+                    const dateText = isSuccess ? job.Date_Applied : 'In Queue';
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div class="job-meta">
+                            <h4>${job.Title}</h4>
+                            <span>${job.Company} &bull; ${dateText}</span>
+                        </div>
+                        <div class="job-state ${isSuccess ? 'ok' : 'wait'}">${isSuccess ? 'Success' : 'Pending'}</div>
+                    `;
+                    list.appendChild(li);
+                });
+            } catch(e) {}
+        }
+
+        function toggleHrMessage() {
+            const v = document.getElementById('cfg_connect_hr').value;
+            const w = document.getElementById('hr_message_wrap');
+            if(v === 'False') {
+                w.style.opacity = '0.3';
+                w.style.pointerEvents = 'none';
+            } else {
+                w.style.opacity = '1';
+                w.style.pointerEvents = 'auto';
+            }
+        }
+
+        async function loadSettings() {
+            try {
+                const r = await fetch('/api/config');
+                const c = await r.json();
+                if(c.search) {
+                    const terms = c.search.search_terms || [];
+                    document.getElementById('cfg_search_terms').value = terms.join(', ');
+                    renderTags(terms);
+                    
+                    const loc = c.search.search_location || '';
+                    document.getElementById('cfg_search_location').value = loc;
+                    document.getElementById('selectedLocationText').innerText = loc || 'Select Location...';
+                    
+                    const date = c.search.date_posted || 'Any time';
+                    document.getElementById('cfg_date_posted').value = date;
+                    document.getElementById('selectedDateText').innerText = date;
+
+                    const easy = c.search.easy_apply_only ? 'True' : 'False';
+                    document.getElementById('cfg_easy_apply_only').value = easy;
+                    document.getElementById('selectedEasyApplyText').innerText = (easy === 'True' ? 'Yes' : 'No');
+                }
+                if(c.questions) {
+                    const visa = c.questions.require_visa || 'No';
+                    document.getElementById('cfg_require_visa').value = visa;
+                    document.getElementById('selectedVisaText').innerText = visa;
+                }
+                if(c.settings) {
+                    const hr = c.settings.connect_hr ? 'True' : 'False';
+                    document.getElementById('cfg_connect_hr').value = hr;
+                    document.getElementById('selectedHrText').innerText = (hr === 'True' ? 'Yes' : 'No');
+                    
+                    document.getElementById('cfg_connect_request_message').value = c.settings.connect_request_message || '';
+                }
+                toggleHrMessage();
+            } catch(e){}
+        }
+
+        async function saveSettings() {
+            const stat = document.getElementById('saveStatus');
+            stat.innerText = 'Syncing...';
+            stat.style.opacity = '1';
+            
+            try {
+                const terms = document.getElementById('cfg_search_terms').value;
+                const listStr = '[' + terms.split(',').map(t => `"${t.trim()}"`).join(', ') + ']';
+
+                const updates = [
+                    { file: 'search.py', key: 'search_terms', value: listStr },
+                    { file: 'search.py', key: 'search_location', value: document.getElementById('cfg_search_location').value },
+                    { file: 'search.py', key: 'date_posted', value: document.getElementById('cfg_date_posted').value },
+                    { file: 'search.py', key: 'easy_apply_only', value: document.getElementById('cfg_easy_apply_only').value },
+                    { file: 'questions.py', key: 'require_visa', value: document.getElementById('cfg_require_visa').value },
+                    { file: 'settings.py', key: 'connect_hr', value: document.getElementById('cfg_connect_hr').value },
+                    { file: 'settings.py', key: 'connect_request_message', value: document.getElementById('cfg_connect_request_message').value }
+                ];
+
+                for (const u of updates) {
+                    await fetch('/api/config', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename: u.file, key: u.key, value: u.value })
+                    });
+                }
+                stat.innerText = 'All changes synced.';
+                setTimeout(() => { stat.style.opacity = '0'; }, 3000);
+            } catch (e) {
+                stat.innerText = 'Sync Failed.';
+                stat.style.color = '#ef4444';
+            }
+        }
+
+        // Init
+        loadSettings();
+        fetchJobs();
+        updateBotStatus();
+        setInterval(fetchLogs, 2000);
+        setInterval(updateBotStatus, 5000);
+        setInterval(fetchJobs, 20000);
+    </script>
+</body>
+</html>

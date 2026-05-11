@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=EliteApplier AI
+Comment=LinkedIn Job Automation Dashboard
+Exec=/home/oradwan/Desktop/Auto_job_applier_linkedIn/launch_dashboard.sh
+Icon=google-chrome
+Terminal=false
+Type=Application
+Categories=Utility;Network;
+StartupNotify=true
