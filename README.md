@@ -11,7 +11,7 @@ Technology Stack
 The project relies on a modern automation and data processing stack:
 - Core Language: Python
 - Browser Automation: Selenium WebDriver and Undetected ChromeDriver
-- Artificial Intelligence: Integrations with OpenAI, Gemini, and DeepSeek for dynamic content generation
+- Artificial Intelligence: Local LLM integration via Ollama for secure, private content generation
 - Data Handling: Python CSV module and Pandas for logging applications and failed attempts
 - Styling & Interface: CSS for the companion Command Center interface
 
@@ -26,7 +26,7 @@ Automation Modules
 The system features dedicated modules for handling distinct tasks:
 - Browser Management: Initializes undetected browser sessions to bypass basic bot detection and handles profile management.
 - Smart Resume Selector: Parses job descriptions to automatically select the most appropriate CV (e.g., German, Data-focused, Cloud-focused, or General Engineering).
-- AI Integration: Connects to external LLM providers to answer custom text questions, generate tailored cover letters, and write connection requests to hiring managers.
+- AI Integration: Connects to a local Ollama instance to autonomously answer complex questions, generate tailored cover letters, and write connection requests to hiring managers.
 - Helper Utilities: Manages directory structures, file logging, and delay buffers.
 
 Configuration Layer
